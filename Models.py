@@ -60,7 +60,12 @@ class Snake:
                                self.body[count].lasty[6 - self.speed],
                                self.body[count].last_angle[6 - self.speed])
 
- 
+    def is_eat_itself(self):
+        for body in self.body:
+            if (self.head, body, 10)
+                return True
+        return False
+
     def animate(self, delta):
         self.head.animate(delta)
         for body in self.body:
@@ -150,9 +155,12 @@ class World:
     def animate(self, delta):
         self.snake.animate(delta)
         self.current_time = time.time()- self.start_time;
-        self.score = int(self.current_time)
+        self.score += int(self.number_body / 5)
+        if (self.snake.is_eat_itself()):
+            self.score -= 100
         self.increase_length()
 
+    
 
     def increase_length(self):
         if (self.number_body < self.current_time):
