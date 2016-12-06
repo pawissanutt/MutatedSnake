@@ -20,6 +20,23 @@ class ModelSprite(arcade.Sprite):
         self.sync_with_model()
         super().draw()
 
+class WorldRenderer:
+    def __init__(self, world) :
+        self.world = world
+
+        self.snake_head_sprite = ModelSprite('images/head.png',model=self.world.snake.head)
+
+    def draw(self):
+        self.snake_head_sprite.draw()
+
+        arcade.draw_text(str(self.world.score),
+                         self.width - 60, self.height - 30,
+                         arcade.color.WHITE, 20)
+
+    def animate(self, delta):
+        self.snake_head_sprite.set_position(self.world.snake.head.x, self.world.snake.head.y)
+
+
 class GameWindow(arcade.Window):
     def __init__(self, width, height):
         super().__init__(width, height)
@@ -28,21 +45,17 @@ class GameWindow(arcade.Window):
 
         self.world = World(width, height)
 
-        self.snake_sprite = ModelSprite('images/head.png',model=self.world.snake.head)
+        self.world_renderer = WorldRenderer(world)
                 
 
     def on_draw(self):
         arcade.start_render()
-        self.snake_sprite.draw()
-
-        arcade.draw_text(str(self.world.score),
-                         self.width - 60, self.height - 30,
-                         arcade.color.WHITE, 20)
+        self.world_renderer.draw()
 
     def animate(self, delta):
         self.world.animate(delta)
-        self.snake_sprite.set_position(self.world.snake.head.x, self.world.snake.head.y)
-
+        self.world_renderer.animate(delta)
+        
     def on_key_press(self, key, key_modifiers):
         self.world.on_key_press(key, key_modifiers)
 
