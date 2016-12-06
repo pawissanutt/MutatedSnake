@@ -21,20 +21,33 @@ class ModelSprite(arcade.Sprite):
         super().draw()
 
 class WorldRenderer:
-    def __init__(self, world) :
+    def __init__(self, world, width, height) :
         self.world = world
-
+        self.width = width
+        self.height = height
+        
         self.snake_head_sprite = ModelSprite('images/head.png',model=self.world.snake.head)
+        self.snake_body_sprite = [ModelSprite('images/body.png',model=self.world.snake.body[0])]
+        self.snake_tail_sprite = ModelSprite('images/tail.png',model=self.world.snake.tail)
+
+    def set_sprite_body(self):
+        while (len(self.snake_body_sprite) < len(self.world.snake.body)):
+            self.snake_body_sprite.append(ModelSprite('images/body.png'
+                                                      ,model=self.world.snake.body[len(self.snake_body_sprite)]))     
 
     def draw(self):
         self.snake_head_sprite.draw()
+        for body in self.snake_body_sprite:
+            body.draw()
+        self.snake_tail_sprite.draw()
 
         arcade.draw_text(str(self.world.score),
                          self.width - 60, self.height - 30,
                          arcade.color.WHITE, 20)
 
     def animate(self, delta):
-        self.snake_head_sprite.set_position(self.world.snake.head.x, self.world.snake.head.y)
+        self.set_sprite_body()
+
 
 
 class GameWindow(arcade.Window):
@@ -45,7 +58,7 @@ class GameWindow(arcade.Window):
 
         self.world = World(width, height)
 
-        self.world_renderer = WorldRenderer(world)
+        self.world_renderer = WorldRenderer(self.world, width, height)
                 
 
     def on_draw(self):
