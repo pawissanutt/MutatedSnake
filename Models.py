@@ -31,6 +31,8 @@ class Model:
     def hit(self, other, hit_size):
         return (abs(self.x - other.x) <= hit_size) and (abs(self.y - other.y) <= hit_size)
 
+    def is_at(self, x, y, size):
+        return (abs(self.x - x) <= size) and (abs(self.y - y) <= size)
 
 class Snake:
    
@@ -61,8 +63,10 @@ class Snake:
                                self.body[count].last_angle[6 - self.speed])
 
     def is_eat_itself(self):
+        x = self.head.get_nextx(20)
+        y = self.head.get_nexty(20)
         for body in self.body:
-            if (self.head, body, 10)
+            if (body.is_at(x, y, 5)):
                 return True
         return False
 
@@ -108,6 +112,12 @@ class HeadSnake(Model):
         elif (self.next_angle - self.angle < 0):
             self.angle -= 10
 
+    def get_nextx(self, speed):
+        return self.x - self.speed * math.sin(math.radians(self.angle))
+
+    def get_nexty(self, speed):
+        return self.y + self.speed * math.cos(math.radians(self.angle))
+        
     def animate(self, delta):
         self.slow_rotate()
         self.set_last_position()
@@ -147,18 +157,20 @@ class World:
         self.height = height
         self.score = 0
         self.start_time = time.time()
+        self.gameover = False
  
         self.snake = Snake(self, 100, 100, 0)
         self.number_body = 1
  
  
     def animate(self, delta):
-        self.snake.animate(delta)
-        self.current_time = time.time()- self.start_time;
-        self.score += int(self.number_body / 5)
-        if (self.snake.is_eat_itself()):
-            self.score -= 100
-        self.increase_length()
+        if (self.gameover == False) :
+            self.snake.animate(delta)
+            self.current_time = time.time()- self.start_time;
+            self.score = int(self.current_time)
+            if (self.snake.is_eat_itself()):
+                self.gameover = True
+            self.increase_length()
 
     
 

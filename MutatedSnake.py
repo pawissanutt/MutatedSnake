@@ -42,8 +42,12 @@ class WorldRenderer:
         self.snake_tail_sprite.draw()
 
         arcade.draw_text(str(self.world.score),
-                         self.width - 60, self.height - 30,
+                         self.width - 80, self.height - 30,
                          arcade.color.WHITE, 20)
+        if (self.world.gameover):
+            arcade.draw_text("Game Over",
+                         self.width/2 - 120, self.height - 100,
+                         arcade.color.WHITE, 40)
 
     def animate(self, delta):
         self.set_sprite_body()
