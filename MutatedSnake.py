@@ -26,20 +26,34 @@ class WorldRenderer:
         self.width = width
         self.height = height
         
-        self.snake_head_sprite = ModelSprite('images/head.png',model=self.world.snake.head)
-        self.snake_body_sprite = [ModelSprite('images/body.png',model=self.world.snake.body[0])]
-        self.snake_tail_sprite = ModelSprite('images/tail.png',model=self.world.snake.tail)
+        self.snake_head_sprite = ModelSprite('images/head.png', model=self.world.snake.head)
+        self.snake_body_sprite = [ModelSprite('images/body.png', model=self.world.snake.body[0])]
+        self.snake_tail_sprite = ModelSprite('images/tail.png', model=self.world.snake.tail)
+
+        self.boxes_sprite = [ModelSprite('images/box1.png', model=self.world.boxes[0])]
 
     def set_sprite_body(self):
         while (len(self.snake_body_sprite) < len(self.world.snake.body)):
             self.snake_body_sprite.append(ModelSprite('images/body.png'
                                                       ,model=self.world.snake.body[len(self.snake_body_sprite)]))     
+        while (len(self.snake_body_sprite) > len(self.world.snake.body)):
+            del self.snake_body_sprite[-1]
+
+    def set_sprite_boxess(self):
+        while (len(self.boxes_sprite) < len(self.world.boxes)):
+            self.boxes_sprite.append(ModelSprite('images/box1.png',
+                                                 model=self.world.boxes[len(self.boxes_sprite)]))     
+        while (len(self.boxes_sprite) > len(self.world.boxes)):
+            del self.boxes_sprite[-1]
 
     def draw(self):
         self.snake_head_sprite.draw()
         for body in self.snake_body_sprite:
             body.draw()
         self.snake_tail_sprite.draw()
+
+        for box in self.boxes_sprite:
+            box.draw()
 
         arcade.draw_text(str(self.world.score),
                          self.width - 80, self.height - 30,

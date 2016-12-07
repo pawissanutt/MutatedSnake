@@ -52,15 +52,17 @@ class Snake:
                 self.head.next_angle = angle
 
     def add_body(self):
-        count = self.body.__len__() - 1
         self.body.append(BodySnake(self.world,
-                                   self.body[count].lastx[5 - self.speed],
-                                   self.body[count].lasty[5 - self.speed],
-                                   self.body[count].last_angle[5 - self.speed]))
-        count += 1
-        self.tail.set_position(self.body[count].lastx[6 - self.speed],
-                               self.body[count].lasty[6 - self.speed],
-                               self.body[count].last_angle[6 - self.speed])
+                                   self.body[-1].lastx[5 - self.speed],
+                                   self.body[-1].lasty[5 - self.speed],
+                                   self.body[-1].last_angle[5 - self.speed]))
+        self.tail.set_position(self.body[-1].lastx[6 - self.speed],
+                               self.body[-1].lasty[6 - self.speed],
+                               self.body[-1].last_angle[6 - self.speed])
+
+    def remove_body(self):
+        if (self.body.__len__() > 1):
+            del self.body[-1]
 
     def is_eat_itself(self):
         x = self.head.get_nextx(20)
@@ -74,7 +76,7 @@ class Snake:
         self.head.animate(delta)
         for body in self.body:
             body.animate(delta)
-        self.tail.animate(delta)
+       # self.tail.animate(delta)
         
         count = self.body.__len__() - 1
         self.tail.set_position(self.body[count].lastx[6 - self.speed],
@@ -86,8 +88,8 @@ class Snake:
                                           self.body[count-1].last_angle[5 - self.speed])
             count -= 1
         self.body[0].set_position(self.head.lastx[5 - self.speed],
-                               self.head.lasty[5 - self.speed],
-                               self.head.last_angle[5 - self.speed])
+                                  self.head.lasty[5 - self.speed],
+                                  self.head.last_angle[5 - self.speed])
 
 
 
@@ -147,9 +149,13 @@ class TailSnake(Model):
     
     def __init__(self, world, x, y, angle):
         super().__init__(world, x, y, angle)
+        
 
-    def animate(self, delta):
-        self.set_last_position()
+class Box(Model):
+    def __init__(self, world, x, y):
+        super().__init__(world, x, y, 0)
+
+
 
 class World:
     def __init__(self, width, height):
@@ -161,18 +167,27 @@ class World:
  
         self.snake = Snake(self, 100, 100, 0)
         self.number_body = 1
- 
+
+        self.boxes = [Box(self, 300, 300)]
+
  
     def animate(self, delta):
         if (self.gameover == False) :
             self.snake.animate(delta)
             self.current_time = time.time()- self.start_time;
             self.score = int(self.current_time)
-            if (self.snake.is_eat_itself()):
-                self.gameover = True
             self.increase_length()
+            if (self.snake.is_eat_itself() or self.is_hit_box()):
+                self.gameover = True
+            
 
-    
+    def is_hit_box(self):
+        x = self.snake.head.get_nextx(20)
+        y = self.snake.head.get_nexty(20)
+        for box in self.boxes:
+            if (box.is_at(x, y, 15)):
+                return True
+        return False
 
     def increase_length(self):
         if (self.number_body < self.current_time):
@@ -188,5 +203,7 @@ class World:
             self.snake.changeAngle(0)
         if key == arcade.key.DOWN:
             self.snake.changeAngle(180)
+        if key == arcade.key.SPACE:
+            self.snake.remove_body()
 
         
