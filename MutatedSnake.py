@@ -30,7 +30,8 @@ class WorldRenderer:
         self.snake_body_sprite = [ModelSprite('images/body.png', model=self.world.snake.body[0])]
         self.snake_tail_sprite = ModelSprite('images/tail.png', model=self.world.snake.tail)
 
-        self.boxes_sprite = [ModelSprite('images/box1.png', model=self.world.boxes[0])]
+        self.red_boxes_sprite = []
+        self.green_box_sprite = ModelSprite('images/box2.png', model=self.world.green_box)
 
     def set_sprite_body(self):
         while (len(self.snake_body_sprite) < len(self.world.snake.body)):
@@ -39,12 +40,12 @@ class WorldRenderer:
         while (len(self.snake_body_sprite) > len(self.world.snake.body)):
             del self.snake_body_sprite[-1]
 
-    def set_sprite_boxess(self):
-        while (len(self.boxes_sprite) < len(self.world.boxes)):
-            self.boxes_sprite.append(ModelSprite('images/box1.png',
-                                                 model=self.world.boxes[len(self.boxes_sprite)]))     
-        while (len(self.boxes_sprite) > len(self.world.boxes)):
-            del self.boxes_sprite[-1]
+    def set_sprite_boxes(self):
+        while (len(self.red_boxes_sprite) < len(self.world.red_boxes)):
+            self.red_boxes_sprite.append(ModelSprite('images/box1.png',
+                                                 model=self.world.red_boxes[len(self.red_boxes_sprite)]))     
+        while (len(self.red_boxes_sprite) > len(self.world.red_boxes)):
+            del self.red_boxes_sprite[-1]
 
     def draw(self):
         self.snake_head_sprite.draw()
@@ -52,8 +53,9 @@ class WorldRenderer:
             body.draw()
         self.snake_tail_sprite.draw()
 
-        for box in self.boxes_sprite:
+        for box in self.red_boxes_sprite:
             box.draw()
+        self.green_box_sprite.draw()
 
         arcade.draw_text(str(self.world.score),
                          self.width - 80, self.height - 30,
@@ -65,6 +67,7 @@ class WorldRenderer:
 
     def animate(self, delta):
         self.set_sprite_body()
+        self.set_sprite_boxes()
 
 
 

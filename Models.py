@@ -1,6 +1,7 @@
 import math
 import arcade.key
 import time
+import random
 
 class Model:
     def __init__(self, world, x, y, angle):
@@ -53,9 +54,9 @@ class Snake:
 
     def add_body(self):
         self.body.append(BodySnake(self.world,
-                                   self.body[-1].lastx[5 - self.speed],
-                                   self.body[-1].lasty[5 - self.speed],
-                                   self.body[-1].last_angle[5 - self.speed]))
+                                   self.body[-1].lastx[6 - self.speed],
+                                   self.body[-1].lasty[6 - self.speed],
+                                   self.body[-1].last_angle[6 - self.speed]))
         self.tail.set_position(self.body[-1].lastx[6 - self.speed],
                                self.body[-1].lasty[6 - self.speed],
                                self.body[-1].last_angle[6 - self.speed])
@@ -67,29 +68,40 @@ class Snake:
     def is_eat_itself(self):
         x = self.head.get_nextx(20)
         y = self.head.get_nexty(20)
+        return self.has_body_at(x, y)
+
+    def has_body_at(self, x, y):
         for body in self.body:
             if (body.is_at(x, y, 5)):
                 return True
+        return False
+
+    def has_snake_at(self, x, y):
+        if (has_body_at(x, y)):
+            return True
+        if (self.head.is_at(x, y, 30)):
+            return True
+        if (self.tail.is_at(x, y, 30)):
+            return True
         return False
 
     def animate(self, delta):
         self.head.animate(delta)
         for body in self.body:
             body.animate(delta)
-       # self.tail.animate(delta)
         
         count = self.body.__len__() - 1
         self.tail.set_position(self.body[count].lastx[6 - self.speed],
                                self.body[count].lasty[6 - self.speed],
                                self.body[count].last_angle[6 - self.speed])
         while (count > 0):
-            self.body[count].set_position(self.body[count-1].lastx[5 - self.speed],
-                                          self.body[count-1].lasty[5 - self.speed],
-                                          self.body[count-1].last_angle[5 - self.speed])
+            self.body[count].set_position(self.body[count-1].lastx[6 - self.speed],
+                                          self.body[count-1].lasty[6 - self.speed],
+                                          self.body[count-1].last_angle[6 - self.speed])
             count -= 1
-        self.body[0].set_position(self.head.lastx[5 - self.speed],
-                                  self.head.lasty[5 - self.speed],
-                                  self.head.last_angle[5 - self.speed])
+        self.body[0].set_position(self.head.lastx[6 - self.speed],
+                                  self.head.lasty[6 - self.speed],
+                                  self.head.last_angle[6 - self.speed])
 
 
 
@@ -168,7 +180,8 @@ class World:
         self.snake = Snake(self, 100, 100, 0)
         self.number_body = 1
 
-        self.boxes = [Box(self, 300, 300)]
+        self.red_boxes = []
+        self.green_box = Box(self, 300, 300)
 
  
     def animate(self, delta):
@@ -177,22 +190,69 @@ class World:
             self.current_time = time.time()- self.start_time;
             self.score = int(self.current_time)
             self.increase_length()
-            if (self.snake.is_eat_itself() or self.is_hit_box()):
+            self.should_create_boxes()
+            self.if_hit_green_box()
+            if (self.snake.is_eat_itself() or self.is_hit_red_box()):
                 self.gameover = True
             
 
-    def is_hit_box(self):
+    def should_create_boxes(self):
+        if (len(self.red_boxes) * 5 < self.score):
+            self.random_create_red_box()
+
+
+    def is_hit_red_box(self):
         x = self.snake.head.get_nextx(20)
         y = self.snake.head.get_nexty(20)
-        for box in self.boxes:
+        return self.has_red_box_at(x, y)
+
+    def has_red_box_at(self, x, y):
+        for box in self.red_boxes:
             if (box.is_at(x, y, 15)):
                 return True
         return False
 
+    def is_hit_green_box(self):
+        x = self.snake.head.get_nextx(20)
+        y = self.snake.head.get_nexty(20)
+        return self.has_green_box_at(x, y)
+
+    def has_green_box_at(self, x, y):
+        return self.green_box.is_at(x, y, 10)
+
+    def random_create_red_box(self):
+        x = random.randint(15, self.width - 15)
+        y = random.randint(50, self.height - 15)
+        while (self.snake.has_body_at(x,y)
+               or self.has_red_box_at(x, y)
+               or self.has_green_box_at(x, y)) :
+            x = random.randint(15, self.width - 15)
+            y = random.randint(50, self.height - 15)
+        self.red_boxes.append(Box(self, x , y))
+
+    def if_hit_green_box(self):
+        if (self.is_hit_green_box()):
+            x = random.randint(15, self.width - 15)
+            y = random.randint(50, self.height - 15)
+            while (self.snake.has_body_at(x,y)
+                   or self.has_red_box_at(x, y)
+                   or self.has_green_box_at(x, y)) :
+                x = random.randint(15, self.width - 15)
+                y = random.randint(50, self.height - 15)
+            self.green_box.x = x
+            self.green_box.y = y
+            self.random_decrease_length(10)
+
     def increase_length(self):
-        if (self.number_body < self.current_time):
+        if (self.number_body / 2 < self.current_time):
             self.snake.add_body()
             self.number_body += 1
+
+    def random_decrease_length(self, max_number):
+        num = random.randint(1, max_number)
+        while (num > 0):
+            self.snake.remove_body()
+            num -=1
 
     def on_key_press(self, key, key_modifiers):
         if key == arcade.key.LEFT:
@@ -203,7 +263,5 @@ class World:
             self.snake.changeAngle(0)
         if key == arcade.key.DOWN:
             self.snake.changeAngle(180)
-        if key == arcade.key.SPACE:
-            self.snake.remove_body()
 
         
