@@ -64,6 +64,9 @@ class WorldRenderer:
             arcade.draw_text("Game Over",
                          self.width/2 - 120, self.height - 100,
                          arcade.color.WHITE, 40)
+            arcade.draw_text("Press any key to restart",
+                         self.width/2 - 200, self.height - 200,
+                         arcade.color.WHITE, 30)
 
     def animate(self, delta):
         self.set_sprite_body()
@@ -92,6 +95,10 @@ class GameWindow(arcade.Window):
         
     def on_key_press(self, key, key_modifiers):
         self.world.on_key_press(key, key_modifiers)
+        if (self.world.gameover):
+           self.world = World(SCREEN_WIDTH, SCREEN_HEIGHT)
+           self.world_renderer = WorldRenderer(self.world, SCREEN_WIDTH, SCREEN_HEIGHT)
+         
 
 
 if __name__ == '__main__':
