@@ -14,7 +14,7 @@ class Model:
         self.last_angle = [angle,angle,angle,angle,angle]
 
     def set_last_position(self):
-        count = 1
+        count = 2
         while (count > 0) :
             self.lastx[count] = self.lastx[count-1]
             self.lasty[count] = self.lasty[count-1]
@@ -23,6 +23,12 @@ class Model:
         self.lastx[0] = self.x
         self.lasty[0] = self.y
         self.last_angle[0] = self.angle
+
+    def get_nextx(self, speed):
+        return self.x - speed * math.sin(math.radians(self.angle))
+
+    def get_nexty(self, speed):
+        return self.y + speed * math.cos(math.radians(self.angle))
 
     def set_position(self, x, y, angle):
         self.x = x
@@ -41,8 +47,8 @@ class Snake:
         self.world = world
         self.x = x
         self.y = y
-        self.speed = 5
-        self.head = HeadSnake(self.world, x, y, angle)
+        self.speed = 4
+        self.head = HeadSnake(self.world, x, y, angle, self.speed)
         self.head.speed = self.speed
         self.body = [BodySnake(self.world, x, y - 30 , angle)]
         self.tail = TailSnake(self.world, x, y - 80, angle)
@@ -54,25 +60,25 @@ class Snake:
 
     def add_body(self):
         self.body.append(BodySnake(self.world,
-                                   self.body[-1].lastx[6 - self.speed],
-                                   self.body[-1].lasty[6 - self.speed],
-                                   self.body[-1].last_angle[6 - self.speed]))
-        self.tail.set_position(self.body[-1].lastx[6 - self.speed],
-                               self.body[-1].lasty[6 - self.speed],
-                               self.body[-1].last_angle[6 - self.speed])
+                                   self.body[-1].lastx[5 - self.speed],
+                                   self.body[-1].lasty[5 - self.speed],
+                                   self.body[-1].last_angle[5 - self.speed]))
+        self.tail.set_position(self.body[-1].lastx[5 - self.speed],
+                               self.body[-1].lasty[5 - self.speed],
+                               self.body[-1].last_angle[5 - self.speed])
 
     def remove_body(self):
         if (self.body.__len__() > 1):
             del self.body[-1]
 
     def is_eat_itself(self):
-        x = self.head.get_nextx(20)
-        y = self.head.get_nexty(20)
+        x = self.head.get_nextx(10)
+        y = self.head.get_nexty(10)
         return self.has_body_at(x, y)
 
     def has_body_at(self, x, y):
         for body in self.body:
-            if (body.is_at(x, y, 5)):
+            if (body.is_at(x, y, 10)):
                 return True
         return False
 
@@ -107,12 +113,12 @@ class Snake:
 
 class HeadSnake(Model):
     
-    def __init__(self, world, x, y, angle):
+    def __init__(self, world, x, y, angle, speed):
         super().__init__(world, x, y, angle)
         self.next_angle = angle
-        self.speed = 3
+        self.speed = speed
 
-    def slow_rotate(self):
+    def slow_rotate(self, delta):
         self.angle %= 360
         if (math.fabs(self.next_angle - self.angle) > 90):
             if (self.next_angle < self.angle):
@@ -122,21 +128,20 @@ class HeadSnake(Model):
                 self.angle %= 360
                 self.angle += 360
         if (self.next_angle - self.angle > 0):
-            self.angle += 10
+            self.angle += int(200 * delta) * 5
+            if (self.next_angle - self.angle < 0):
+                self.angle = self.next_angle
         elif (self.next_angle - self.angle < 0):
-            self.angle -= 10
-
-    def get_nextx(self, speed):
-        return self.x - self.speed * math.sin(math.radians(self.angle))
-
-    def get_nexty(self, speed):
-        return self.y + self.speed * math.cos(math.radians(self.angle))
+            self.angle -= int(200 * delta) * 5
+            if (self.next_angle - self.angle > 0):
+                self.angle = self.next_angle
         
+            
     def animate(self, delta):
-        self.slow_rotate()
+        self.slow_rotate(delta)
         self.set_last_position()
-        self.x -= self.speed * math.sin(math.radians(self.angle))
-        self.y += self.speed * math.cos(math.radians(self.angle))
+        self.x -= self.speed * 50 * delta * math.sin(math.radians(self.angle))
+        self.y += self.speed * 50 * delta * math.cos(math.radians(self.angle))
         if (self.x > self.world.width):
             self.x = 0
         elif (self.x < 0):
@@ -202,8 +207,8 @@ class World:
 
 
     def is_hit_red_box(self):
-        x = self.snake.head.get_nextx(20)
-        y = self.snake.head.get_nexty(20)
+        x = self.snake.head.get_nextx(10)
+        y = self.snake.head.get_nexty(10)
         return self.has_red_box_at(x, y)
 
     def has_red_box_at(self, x, y):
@@ -213,8 +218,8 @@ class World:
         return False
 
     def is_hit_green_box(self):
-        x = self.snake.head.get_nextx(20)
-        y = self.snake.head.get_nexty(20)
+        x = self.snake.head.get_nextx(10)
+        y = self.snake.head.get_nexty(10)
         return self.has_green_box_at(x, y)
 
     def has_green_box_at(self, x, y):
