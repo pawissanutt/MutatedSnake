@@ -41,11 +41,12 @@ class WorldRenderer:
             del self.snake_body_sprite[-1]
 
     def set_sprite_boxes(self):
+        while (len(self.red_boxes_sprite) > len(self.world.red_boxes)):
+            self.red_boxes_sprite = []
         while (len(self.red_boxes_sprite) < len(self.world.red_boxes)):
             self.red_boxes_sprite.append(ModelSprite('images/box1.png',
                                                  model=self.world.red_boxes[len(self.red_boxes_sprite)]))     
-        while (len(self.red_boxes_sprite) > len(self.world.red_boxes)):
-            self.red_boxes_sprite = []
+        
 
     def draw(self):
         self.snake_head_sprite.draw()
