@@ -181,6 +181,7 @@ class World:
         self.score = 0
         self.start_time = time.time()
         self.gameover = False
+        self.god_mode = False
  
         self.snake = Snake(self, 100, 100, 0)
         self.number_body = 1
@@ -197,8 +198,13 @@ class World:
             self.increase_length()
             self.should_create_boxes()
             self.if_hit_green_box()
-            if (self.snake.is_eat_itself() or self.is_hit_red_box()):
+            if (self.snake.is_eat_itself()):
                 self.gameover = True
+            if (self.is_hit_red_box()):
+                if (self.god_mode):
+                    del self.red_boxes[self.get_hit_red_box()]
+                else :
+                    self.gameover = True
             
 
     def should_create_boxes(self):
@@ -211,11 +217,25 @@ class World:
         y = self.snake.head.get_nexty(10)
         return self.has_red_box_at(x, y)
 
+    def get_hit_red_box(self):
+        x = self.snake.head.get_nextx(10)
+        y = self.snake.head.get_nexty(10)
+        return self.get_red_box_at(x, y)
+
+
     def has_red_box_at(self, x, y):
         for box in self.red_boxes:
             if (box.is_at(x, y, 15)):
                 return True
         return False
+
+    def get_red_box_at(self, x, y):
+        count = 0
+        while (count < len(self.red_boxes)):
+            if (self.red_boxes[count].is_at(x, y, 15)):
+                return count
+            count += 1
+        return -1
 
     def is_hit_green_box(self):
         x = self.snake.head.get_nextx(10)
@@ -259,6 +279,9 @@ class World:
             self.snake.remove_body()
             num -=1
 
+    def toggle_god_mode(self):
+        self.god_mode = not self.god_mode
+
     def on_key_press(self, key, key_modifiers):
         if key == arcade.key.LEFT:
             self.snake.changeAngle(90)
@@ -268,5 +291,7 @@ class World:
             self.snake.changeAngle(0)
         if key == arcade.key.DOWN:
             self.snake.changeAngle(180)
+        if key == arcade.key.G:
+            self.toggle_god_mode()
 
         

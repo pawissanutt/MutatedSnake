@@ -45,7 +45,7 @@ class WorldRenderer:
             self.red_boxes_sprite.append(ModelSprite('images/box1.png',
                                                  model=self.world.red_boxes[len(self.red_boxes_sprite)]))     
         while (len(self.red_boxes_sprite) > len(self.world.red_boxes)):
-            del self.red_boxes_sprite[-1]
+            self.red_boxes_sprite = []
 
     def draw(self):
         self.snake_head_sprite.draw()
@@ -59,6 +59,10 @@ class WorldRenderer:
 
         arcade.draw_text(str(self.world.score),
                          self.width - 80, self.height - 30,
+                         arcade.color.WHITE, 20)
+        if (self.world.god_mode):
+            arcade.draw_text("God Mode Activated!!!",
+                         self.width/2 - 120, self.height - 50,
                          arcade.color.WHITE, 20)
         if (self.world.gameover):
             arcade.draw_text("Game Over",
