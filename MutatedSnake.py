@@ -26,16 +26,16 @@ class WorldRenderer:
         self.width = width
         self.height = height
         
-        self.snake_head_sprite = ModelSprite('images/head.png', model=self.world.snake.head)
-        self.snake_body_sprite = [ModelSprite('images/body.png', model=self.world.snake.body[0])]
-        self.snake_tail_sprite = ModelSprite('images/tail.png', model=self.world.snake.tail)
+        self.snake_head_sprite = ModelSprite('Images/head.png', model=self.world.snake.head)
+        self.snake_body_sprite = [ModelSprite('Images/body.png', model=self.world.snake.body[0])]
+        self.snake_tail_sprite = ModelSprite('Images/tail.png', model=self.world.snake.tail)
 
         self.red_boxes_sprite = []
-        self.green_box_sprite = ModelSprite('images/box2.png', model=self.world.green_box)
+        self.green_box_sprite = ModelSprite('Images/box2.png', model=self.world.green_box)
 
     def set_sprite_body(self):
         while (len(self.snake_body_sprite) < len(self.world.snake.body)):
-            self.snake_body_sprite.append(ModelSprite('images/body.png'
+            self.snake_body_sprite.append(ModelSprite('Images/body.png'
                                                       ,model=self.world.snake.body[len(self.snake_body_sprite)]))     
         while (len(self.snake_body_sprite) > len(self.world.snake.body)):
             del self.snake_body_sprite[-1]
@@ -44,7 +44,7 @@ class WorldRenderer:
         while (len(self.red_boxes_sprite) > len(self.world.red_boxes)):
             self.red_boxes_sprite = []
         while (len(self.red_boxes_sprite) < len(self.world.red_boxes)):
-            self.red_boxes_sprite.append(ModelSprite('images/box1.png',
+            self.red_boxes_sprite.append(ModelSprite('Images/box1.png',
                                                  model=self.world.red_boxes[len(self.red_boxes_sprite)]))     
         
 
